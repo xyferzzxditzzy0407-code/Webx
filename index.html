@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colok Haptik Real</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            width: 360px;
+            text-align: center;
+            border: 1px solid #334155;
+        }
+        h2 { margin-top: 0; color: #38bdf8; font-size: 20px; }
+        p { color: #94a3b8; font-size: 13px; margin-bottom: 20px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            text-align: center;
+        }
+        input:focus { border-color: #38bdf8; }
+        button {
+            width: 100%;
+            background: #0284c7;
+            color: white;
+            border: none;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover { background: #0369a1; }
+        .hidden { display: none; }
+        #status {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #cbd5e1;
+            word-break: break-word;
+        }
+        .otp-box {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #38bdf8;
+            margin-top: 15px;
+        }
+        .otp-box span {
+            font-size: 24px;
+            font-weight: bold;
+            color: #38bdf8;
+            letter-spacing: 2px;
+            display: block;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Colok Haptik Bot</h2>
+        <p>Masukkan nomor WhatsApp Business target</p>
+
+        <!-- 1 KOLOM INPUT NOMOR -->
+        <div id="form-container">
+            <input type="text" id="phoneNumber" placeholder="Contoh: 55719974" autofocus>
+            <button id="btnProses" onclick="prosesColokHaptik()">Proses Bot Real</button>
+        </div>
+
+        <div id="otpDisplay" class="otp-box hidden">
+            Kode OTP Real dari Bot:
+            <span id="realOtpCode">------</span>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        async function prosesColokHaptik() {
+            const phone = document.getElementById('phoneNumber').value;
+            const statusDiv = document.getElementById('status');
+            const btn = document.getElementById('btnProses');
+            const otpDisplay = document.getElementById('otpDisplay');
+
+            if (!phone) {
+                alert('Masukkan nomor telepon dulu!');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'Bot Sedang Bekerja...';
+            statusDiv.innerHTML = '⏳ Bot membuka browser target & memproses nomor...';
+
+            try {
+                const res = await fetch('/api/colok-haptik', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phoneNumber: phone })
+                });
+
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    document.getElementById('realOtpCode').innerText = data.code;
+                    otpDisplay.classList.remove('hidden');
+                    statusDiv.innerHTML = '<b style="color:#4ade80;">🎉 Proses Berhasil! Bot Selesai Menghubungkan ke neko.box.my.id</b>';
+                } else {
+                    statusDiv.innerHTML = `<span style="color:#f87171;">❌ Gagal: ${data.message}</span>`;
+                }
+            } catch (err) {
+                statusDiv.innerHTML = '<span style="color:#f87171;">❌ Koneksi ke server terputus.</span>';
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Proses Bot Real';
+            }
+        }
+    </script>
+
+</body>
+</html>
